@@ -2,10 +2,10 @@ import Data_Editing_Helpers as DEH
 import Classifier as CLF
 import Regressor as RGS
 import threading
-
-
 import pandas as pd
 from sklearn.metrics import accuracy_score, r2_score
+
+#test for VS git integration
 
 ## Loading ##
 test = pd.read_csv("test.csv")
