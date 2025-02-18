@@ -5,22 +5,23 @@ import threading
 import pandas as pd
 from sklearn.metrics import accuracy_score, r2_score
 
-#test for VS git integration
-
 ## Loading ##
-test = pd.read_csv("test.csv")
-train = pd.read_csv("train.csv")
+test = pd.read_csv("Data/test.csv")
+train = pd.read_csv("Data/train.csv")
 
 y_name = 'Price' # What you're trying to predict
 x_name = 'id' # User id. Drop this column
 
+# Set this to True if you want to run regression models, False for classification models
+is_regression = True
+
 ## Wrangling ##
-# train, test = DEH.map_seasons(train, test)
+#Future implementation will remove map_seasons and convert_strings_to_ascii
+train, test = DEH.map_seasons(train, test)
+#train = DEH.convert_strings_to_ascii(train)
+#test = DEH.convert_strings_to_ascii(test)
 train, test = DEH.dropUnusedColumns(train, test, y_name, x_name)
 train = DEH.remove_blank_rows(train, y_name)
-
-train = DEH.convert_strings_to_ascii(train)
-test = DEH.convert_strings_to_ascii(test)
 
 # Using 99 as a filler for NA's. Will change to use Random Forest for filling NA's 
 train, test = DEH.fill_NA(train, test, fill=99)
@@ -28,7 +29,6 @@ X_train, X_test, y_train, y_test = DEH.traintestslpit(train, y_name)
 
 ## Visualizing ##
 # DEH.makeSNS(train)   # This outputs all graphs, can be annoying
-# print(train)
 
 ## Function to evaluate and store model performance ##
 def evaluate_model(model_func, X_train, y_train, X_test, y_test, model_name, results, is_regression):
@@ -43,10 +43,7 @@ def evaluate_model(model_func, X_train, y_train, X_test, y_test, model_name, res
 
 ## Training Models ##
 results = []
-
-# Set this to True if you want to run regression models, False for classification models
-is_regression = True
-
+# List of models to evaluate
 t = []
 
 if is_regression:
@@ -57,7 +54,7 @@ if is_regression:
     t4 = threading.Thread(target=evaluate_model(RGS.lassoRegressor, X_train, y_train, X_test, y_test, "Lasso Regressor", results, is_regression))
     t5 = threading.Thread(target=evaluate_model(RGS.randomForestRegressor, X_train, y_train, X_test, y_test, "Random Forest Regressor", results, is_regression))
     t6 = threading.Thread(target=evaluate_model(RGS.gradientBoostingRegressor, X_train, y_train, X_test, y_test, "Gradient Boosting Regressor", results, is_regression))
-    t.extend([t1, t2, t3, t4, t5])  #Add to list as models increase
+    t.extend([t1, t2, t3, t4])  #Add to list as models increase
     for i in t:
         i.start()
 else:

@@ -6,7 +6,6 @@ import pyarrow.parquet as pq
 import joblib
 from sklearn.model_selection import train_test_split
 
-
 # Mapping for seasons
 season_mapping = {
     "Adidas" : 11,
@@ -107,13 +106,6 @@ def fill_NA(train, test, fill):
         test[col] = test[col].fillna(fill)
     return train, test
 
-
-def get_dummies(train, test):
-    train = pd.get_dummies(train)
-    test = pd.get_dummies(test)    # needs to be changed from get dummies to something better!!!!
-    return train, test
-
-
 def remove_blank_rows(train, y_name):
     return train.dropna(subset=[y_name])
 
@@ -141,11 +133,6 @@ def generate_submission(y_predictions, x_name, y_name):
     print(f'\nSubmission Preview:\n {submission}')
     submission.to_csv('submission.csv', index=False)
 
-
 def saveModel(model, file_name):
     joblib.dump(model, file_name)
-
-def makePredictionUsingModel(file_path, X_test):
-    model = joblib.load(file_path)
-    y_pred_optimized = model.predict(X_test)
-    return y_pred_optimized
+    print(f"Model saved to {file_name}")
