@@ -4,21 +4,46 @@ import seaborn as sns
 import os
 import pyarrow.parquet as pq
 import joblib
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import  DecisionTreeClassifier
-from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
+
 
 # Mapping for seasons
 season_mapping = {
-    'Spring' : 1,
-    'Summer' : 2,
-    'Fall'   : 3,
-    'Winter' : 4
+    "Adidas" : 11,
+    "Under Armour" : 12,
+    "Nike" : 13,
+    "Puma" : 14,
+    "Jansport" : 15,
+    "Yes" : 22, 
+    "No" : 23,
+    "Polyester" : 2,
+    "Leather" : 3,
+    "Nylon" : 4,
+    "Canvas" : 5,
+    "Medium" : 6,
+    "Large" : 7,
+    "Small" : 8,
+    "Messenger" : 9,
+    "Tote" : 10,
+    "Backpack" : 16,
+    "Pink" : 17,
+    "Gray" : 18,
+    "Blue" : 19,
+    "Red" : 20,
+    "Green" : 21,
+
 }
+
+def convert_strings_to_ascii(df):
+    def to_ascii(value):
+        if isinstance(value, str):
+            return ''.join(str(ord(char)) for char in value)
+        return value
+
+    for col in df.columns:
+        df[col] = df[col].apply(to_ascii)
+    
+    return df
 
 def unCacheOrLoad(file):
     # Path for the cache file
@@ -92,7 +117,6 @@ def get_dummies(train, test):
 def remove_blank_rows(train, y_name):
     return train.dropna(subset=[y_name])
 
-
 def makeSNS(train):
     sns.set_style("whitegrid")
     for column in train.columns:
@@ -109,74 +133,13 @@ def traintestslpit(train, y_name):
     X_train = train.drop(y_name, axis=1)
     return X_train, X_test, y_train, y_test
 
-def decisiontree(X_train, y_train, y_name):
-
-    dt_model = DecisionTreeClassifier(random_state=1235)
-    param_grid = {
-        'max_depth': [3, 5, 7, 9],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 5, 10],
-        'criterion': ['gini', 'entropy']
-    }
-    random_search = RandomizedSearchCV(dt_model, param_grid, cv=5, scoring='accuracy', n_iter=10, random_state=1103)
-    random_search.fit(X_train, y_train)
-
-    best_params = random_search.best_params_
-
-    best_model_dt = random_search.best_estimator_
-
-    print(f'\nBest parameters Decisiontree: {best_params}')
-    saveModel(best_model_dt, './TrainedModels/decisionTreeModel.pkl')
-
-
-def knn(X_train, y_train,  y_name):
-
-    dt_model = KNeighborsClassifier()
-    param_grid = {
-        "n_neighbors": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        "weights": ["uniform", "distance"],
-        "algorithm": ["ball_tree", "kd_tree", "brute"],
-        "leaf_size": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        "p": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    }
-
-    random_search = RandomizedSearchCV(dt_model, param_grid, cv=5, scoring='accuracy', n_iter=10, random_state=1103)
-    random_search.fit(X_train, y_train)
-
-
-    best_params = random_search.best_params_
-    best_model_dt = random_search.best_estimator_
-
-    print(f'\nBest parameters KNN: {best_params}')
-    saveModel(best_model_dt, './TrainedModels/knnModel.pkl')
-
-def adaboostClassifier(X_train, y_train, y_name):
-
-    dt_model = AdaBoostClassifier()
-
-    param_grid = {
-        'n_estimators': [50, 100, 150, 200],
-        'learning_rate': [0.01, 0.1, 0.5, 1.0],
-        'algorithm': ['SAMME']
-    }
-    random_search = GridSearchCV(dt_model, param_grid)
-    random_search.fit(X_train, y_train)
-
-    best_params = random_search.best_params_
-    best_model_dt = random_search.best_estimator_
-
-    print(f'\nBest parameters: {best_params}')
-
-    saveModel(best_model_dt, './TrainedModels/adaModel.pkl')
-
-
 def generate_submission(y_predictions, x_name, y_name):
     test = pd.read_csv('test.csv')
     submission = pd.DataFrame({x_name: test[x_name],
                                y_name : y_predictions})
 
     print(f'\nSubmission Preview:\n {submission}')
-    submission.to_csv('submission.csvy', index=False)
+    submission.to_csv('submission.csv', index=False)
 
 
 def saveModel(model, file_name):
@@ -186,7 +149,3 @@ def makePredictionUsingModel(file_path, X_test):
     model = joblib.load(file_path)
     y_pred_optimized = model.predict(X_test)
     return y_pred_optimized
-
-def accuracy (file_path,y_pred_optimized, y_test):
-    accuracy = accuracy_score(y_test, y_pred_optimized)
-    print("Accuracy of the :" + str(file_path) + "{:.2f}%".format(accuracy * 100))
