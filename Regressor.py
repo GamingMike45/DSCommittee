@@ -3,19 +3,21 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 def decisiontreeRegressor(X_train, y_train):
     print("\nDecision Tree Regressor Started")
-    dt_model = DecisionTreeRegressor(random_state=301)
+    dt_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', DecisionTreeRegressor(random_state=301))
+    ])
     param_grid = {
-        'max_depth': [1, 3, 5, 7, 10, 15], #Max depth of the tree
-        'min_samples_split': [2, 5, 10], #Min sample 
-        'min_samples_leaf': [1, 3, 5, 10], # Min samples in a leaf
-        'max_features': [None, 'sqrt', 'log2'], # Number of features per split
-        'criterion': ['poisson', 'friedman_mse', 'squared_error', 'absolute_error'], # Function to measure quality of a split
-        'splitter': ['best'], # Strategy to choose split
-        'max_leaf_nodes': [None, 5, 10, 15], # Max number of leaf nodes
-        'min_weight_fraction_leaf': [0.0, 0.1, 0.2] # Min weight fraction of the sum total of weights
+        'regressor__max_depth': [1, 3, 5, 7],
+        'regressor__min_samples_split': [2, 5, 10],
+        'regressor__min_samples_leaf': [1, 3, 5, 10],
+        'regressor__max_leaf_nodes': [None, 5, 10, 15],
+        'regressor__min_weight_fraction_leaf': [0.0, 0.1, 0.2]
     }
 
     random_search = RandomizedSearchCV(dt_model, param_grid, cv=5, scoring='r2', n_iter=10, random_state=1103)
@@ -31,7 +33,10 @@ def decisiontreeRegressor(X_train, y_train):
 
 def linearRegressor(X_train, y_train):
     print("\nLinear Regressor Started")
-    lr_model = LinearRegression()
+    lr_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', LinearRegression())
+    ])
     lr_model.fit(X_train, y_train)
     DEH.saveModel(lr_model, './TrainedModels/linearRegressor.pkl')
     print("Linear Regressor Finished")
@@ -39,9 +44,12 @@ def linearRegressor(X_train, y_train):
 
 def ridgeRegressor(X_train, y_train):
     print("\nRidge Regressor Started")
-    ridge_model = Ridge()
+    ridge_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', Ridge())
+    ])
     param_grid = {
-        'alpha': [0.1, 1.0, 10.0, 100, 1000]
+        'regressor__alpha': [0.1, 1.0, 10.0, 100, 1000, 10000, 100000]
     }
 
     grid_search = GridSearchCV(ridge_model, param_grid, cv=5, scoring='r2')
@@ -57,9 +65,12 @@ def ridgeRegressor(X_train, y_train):
 
 def lassoRegressor(X_train, y_train):
     print("\nLasso Regressor Started")
-    lasso_model = Lasso()
+    lasso_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', Lasso())
+    ])
     param_grid = {
-        'alpha': [1e-4, 1e-3, 1e-2, 0.1, 1.0, 10.0, 1000, 1000]
+        'regressor__alpha': [1e-4, 1e-3, 1e-2, 0.1, 1.0, 10.0, 1000, 10000]
     }
 
     grid_search = GridSearchCV(lasso_model, param_grid, cv=5, scoring='r2')
@@ -75,14 +86,15 @@ def lassoRegressor(X_train, y_train):
 
 def randomForestRegressor(X_train, y_train):
     print("\nRandom Forest Regressor Started")
-    rf_model = RandomForestRegressor(random_state=301)
+    rf_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', RandomForestRegressor(random_state=301))
+    ])
     param_grid = {
-        'n_estimators': [50, 100, 150],  # Number of trees
-        'max_depth': [None, 1, 2, 3, 5, 7, 9], #Depth of each tree
-        'min_samples_split': [2, 5, 10], # Min sample split to a node
-        'min_samples_leaf': [1, 5, 10], # Min samples in a leaf
-        'max_features': [None, 'sqrt, log2'], # Number of features per split
-        'bootstrap': [True, False] #sample Method
+        'regressor__n_estimators': [50, 100, 150],
+        'regressor__max_depth': [None, 1, 2, 3],
+        'regressor__min_samples_split': [2, 5, 10],
+        'regressor__min_samples_leaf': [1, 5, 10],
     }
 
     random_search = RandomizedSearchCV(rf_model, param_grid, cv=5, scoring='r2', n_iter=10, random_state=1103)
@@ -98,18 +110,19 @@ def randomForestRegressor(X_train, y_train):
 
 def gradientBoostingRegressor(X_train, y_train):
     print("\nGradient Boosting Regressor Started")
-    gb_model = GradientBoostingRegressor(random_state=301)
+    gb_model = Pipeline([
+        ('scaler', StandardScaler()),
+        ('regressor', GradientBoostingRegressor(random_state=301))
+    ])
     param_grid = {
-        'n_estimators': [50, 100, 150, 300, 800], #Number of boosting stageds
-        'learning_rate': [0.001, 0.01, 0.1, 0.5], # Shrinks the contributuon of trees
-        'max_depth': [3, 5, 7, 9], #Tree depth
-        'min_samples_split': [2, 5, 10], # Min sample split to a node
-        'min_samples_leaf': [1, 5, 10], # Min samples in a leaf
-        'max_features': ['auto', 'sqrt, log2'], # Number of features per split
-        'subsample': [0.5, 0.7, 1.0] # Fraction of samples to be used for fitting
+        'regressor__n_estimators': [50, 100, 150, 300],
+        'regressor__learning_rate': [0.001, 0.01, 0.1],
+        'regressor__max_depth': [3, 5, 7],
+        'regressor__min_samples_split': [2, 5, 10],
+        'regressor__min_samples_leaf': [1, 5, 10],
     }
 
-    random_search = RandomizedSearchCV(gb_model, param_grid, cv=5, scoring='r2', n_iter=10, n_iter_no_change=10,random_state=1103)
+    random_search = RandomizedSearchCV(gb_model, param_grid, cv=5, scoring='r2', n_iter=10, random_state=1103)
     random_search.fit(X_train, y_train)
 
     best_params = random_search.best_params_

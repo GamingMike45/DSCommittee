@@ -1,3 +1,4 @@
-Data/
-TrainedModels/
+Data/*
 __pycache__/
+TrainedModels/*
+submission.csv

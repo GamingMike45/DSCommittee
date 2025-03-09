@@ -126,7 +126,7 @@ def traintestslpit(train, y_name):
     return X_train, X_test, y_train, y_test
 
 def generate_submission(y_predictions, x_name, y_name):
-    test = pd.read_csv('test.csv')
+    test = pd.read_csv('Data/test.csv')
     submission = pd.DataFrame({x_name: test[x_name],
                                y_name : y_predictions})
 
