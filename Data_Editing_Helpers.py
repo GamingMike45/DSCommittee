@@ -111,9 +111,9 @@ def remove_blank_rows(train, y_name):
 
 def makeSNS(train):
     sns.set_style("whitegrid")
-    for column in train.columns:
-        sns.countplot(train, x=column)
-        plt.show()
+    sns.heatmap(train.corr(), annot=True) # This outputs a heatmap of the correlation between all columns
+    plt.figure(figsize=(20, 20))
+    plt.show()
     print("done")
 
 def traintestslpit(train, y_name):
