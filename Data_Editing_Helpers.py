@@ -125,14 +125,6 @@ def traintestslpit(train, y_name):
     X_train = train.drop(y_name, axis=1)
     return X_train, X_test, y_train, y_test
 
-def generate_submission(y_predictions, x_name, y_name):
-    test = pd.read_csv('Data/test.csv')
-    submission = pd.DataFrame({x_name: test[x_name],
-                               y_name : y_predictions})
-
-    print(f'\nSubmission Preview:\n {submission}')
-    submission.to_csv('submission.csv', index=False)
-
 def saveModel(model, file_name):
     joblib.dump(model, file_name)
     print(f"Model saved to {file_name}")
