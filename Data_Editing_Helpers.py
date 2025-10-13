@@ -8,28 +8,7 @@ from sklearn.model_selection import train_test_split
 
 # Mapping for seasons
 season_mapping = {
-    "Adidas" : 11,
-    "Under Armour" : 12,
-    "Nike" : 13,
-    "Puma" : 14,
-    "Jansport" : 15,
-    "Yes" : 22, 
-    "No" : 23,
-    "Polyester" : 2,
-    "Leather" : 3,
-    "Nylon" : 4,
-    "Canvas" : 5,
-    "Medium" : 6,
-    "Large" : 7,
-    "Small" : 8,
-    "Messenger" : 9,
-    "Tote" : 10,
-    "Backpack" : 16,
-    "Pink" : 17,
-    "Gray" : 18,
-    "Blue" : 19,
-    "Red" : 20,
-    "Green" : 21,
+
 
 }
 
@@ -75,7 +54,8 @@ def dropUnusedColumns(train, test, y_name, x_name):
     columns = train.columns.difference(test.columns)
     column_list = columns.to_list()
     column_list.append(x_name)
-    column_list.remove(y_name)
+    if y_name in column_list:
+        column_list.remove(y_name)
     print(f'\nDeleting unsililare rows: {column_list}')
 
     train = train.drop(column_list, axis=1)
