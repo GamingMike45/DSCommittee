@@ -3,3 +3,6 @@ __pycache__/
 TrainedModels/*
 submission.csv
 catboost_info/*
+glove.6B.*.txt
+glove.6B.zip
+submission*.txt
