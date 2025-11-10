@@ -57,8 +57,8 @@ Provides preprocessing, model training, saving/loading, evaluation, simple stack
 - pandas, numpy, scikit-learn, joblib
 - torch, skorch, catboost, xgboost (optional, only if used)
 - nltk (stopwords)
-- Install via pip as needed (example):  
-  pip install pandas numpy scikit-learn joblib torch skorch catboost xgboost nltk
+- Install via pip all packages:  
+  pip install -r requirements.txt
 
 ## How to contribute
 - Open an issue or submit a PR.
